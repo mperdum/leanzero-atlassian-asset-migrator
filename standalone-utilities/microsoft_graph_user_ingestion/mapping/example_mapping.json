@@ -1,0 +1,48 @@
+{
+  "_comment": "This file maps Microsoft Graph API user attributes to Jira Cloud Assets object type attributes.",
+  "_comment": "Keys are Microsoft Graph API attribute names",
+  "_comment": "Values are the exact attribute names in your Jira Cloud Assets object type",
+
+  "_comment": "=== Basic User Information ===",
+  "displayName": "Name",
+  "givenName": "Given name",
+  "surname": "Surname",
+  "userPrincipalName": "sAMAccountName",
+  "id": "objectGUID",
+
+  "_comment": "=== Job and Organizational Information ===",
+  "jobTitle": "Title",
+  "department": "Department",
+  "officeLocation": "Location",
+  "companyName": "Company",
+  "employeeId": "employeeID",
+
+  "_comment": "=== Contact Information ===",
+  "mail": "E-Mail",
+  "businessPhones": "Phone",
+  "mobilePhone": "Mobile",
+
+  "_comment": "=== Account Status ===",
+  "accountEnabled": "Status",
+
+  "_comment": "=== The following attributes don't have equivalents in Microsoft Graph API ===",
+  "_comment": "Absence (not available in Microsoft Graph)",
+  "_comment": "Manager (requires separate $expand query - not implemented)",
+  "_comment": "departmentNumber (not available in Microsoft Graph)",
+  "_comment": "lastLogon (not available in Microsoft Graph)",
+  "_comment": "Software Asset Administrator (not available in Microsoft Graph)",
+  "_comment": "userAccountControl (not available in Microsoft Graph)",
+  "_comment": "impNotInInternal (not available in Microsoft Graph)",
+  "_comment": "impNotInExternal (not available in Microsoft Graph)",
+  "_comment": "impNotInUsers (not available in Microsoft Graph)",
+  "_comment": "Review (not available in Microsoft Graph)",
+  "_comment": "Cost centre (not available in Microsoft Graph)",
+
+  "_comment": "Usage Instructions:",
+  "_comment": "1. Copy this file and rename it (e.g., custom_mapping.json)",
+  "_comment": "2. Update the values on the right to match your exact Jira Cloud Assets attribute names",
+  "_comment": "3. Run the script with: npm start -- --mapping custom_mapping.json",
+  "_comment": "4. The script will query your object type and use attribute names to find correct IDs",
+
+  "_comment": "Note: Attribute names on the right side must EXACTLY match your Jira Cloud Assets object type attribute names"
+}

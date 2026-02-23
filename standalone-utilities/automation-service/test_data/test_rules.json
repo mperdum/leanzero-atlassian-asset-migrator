@@ -1,0 +1,74 @@
+{
+  "rules": [
+    {
+      "name": "Rule with mapped project",
+      "trigger": {
+        "type": "jira.issue.event.trigger:created",
+        "value": {
+          "eventFilters": [
+            "ari:cloud:jira::project/10000"
+          ]
+        }
+      },
+      "components": [
+        {
+          "type": "jira.issue.create",
+          "value": {
+            "operations": [
+              {
+                "fieldType": "project",
+                "type": "SET",
+                "value": {
+                  "type": "ID",
+                  "value": "10000"
+                }
+              }
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "Rule with unmapped project in trigger",
+      "trigger": {
+        "type": "jira.issue.event.trigger:created",
+        "value": {
+          "eventFilters": [
+            "ari:cloud:jira::project/99999"
+          ]
+        }
+      },
+      "components": []
+    },
+    {
+      "name": "Rule with unmapped project in component",
+      "trigger": {
+        "type": "jira.manual.trigger.issue"
+      },
+      "components": [
+        {
+          "type": "jira.issue.create",
+          "projectId": "88888",
+          "value": {}
+        }
+      ]
+    },
+    {
+      "name": "Rule with no project references",
+      "trigger": {
+        "type": "jira.jql.scheduled",
+        "value": {
+          "jqlFilter": "status = Open"
+        }
+      },
+      "components": [
+        {
+          "type": "jira.issue.comment",
+          "value": {
+            "comment": "Test comment"
+          }
+        }
+      ]
+    }
+  ]
+}

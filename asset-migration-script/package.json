@@ -1,0 +1,25 @@
+{
+  "name": "asset-migration-script",
+  "version": "2.0.0",
+  "description": "Enhanced script to migrate datacenter assets to cloud with 100% success requirement",
+  "main": "main.js",
+  "scripts": {
+    "start": "node main.js",
+    "dry-run": "node main.js --dry-run",
+    "test": "node main.js --dry-run --limit 5",
+    "report": "node main.js --report",
+    "resume": "node main.js --resume"
+  },
+  "keywords": [
+    "migration",
+    "datacenter",
+    "cloud"
+  ],
+  "author": "Asset Migration Tool",
+  "license": "MIT",
+  "dependencies": {
+    "dotenv": "^17.2.1",
+    "form-data": "^4.0.0",
+    "p-limit": "^3.1.0"
+  }
+}

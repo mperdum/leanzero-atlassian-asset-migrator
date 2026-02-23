@@ -1,0 +1,52 @@
+# AI editor rules
+.clinerules/
+.kilocode/
+.roo/
+.windsurf/
+.cursor/
+.kiro/
+.qoder/
+.augment/
+.claude/
+
+# Environment files (contain credentials)
+*.env
+!*.env.example*
+!env.example*
+
+# Log and data files
+*.log
+logs/
+log.txt
+*_evidence.log
+*_fixed_cloud_*.json
+*_populated_*.json
+migration_logs/
+standalone-utilities/connect_assets_tickets/logs/
+
+# Sensitive data / mapping files
+automation.json
+datacenter_cloud_mapping.json
+datacenter_assets/
+cloud_assets/
+*.csv
+
+# Backup files
+*.backup
+*.backup_split
+*.js.backup
+
+# Example exports with company data
+standalone-utilities/automation-service/eg-exports/
+
+# OpenAPI specs
+openapi*.json
+
+# Node modules
+node_modules/
+
+# OS files
+.DS_Store
+
+# Zip archives
+*.zip

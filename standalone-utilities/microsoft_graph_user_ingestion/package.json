@@ -1,0 +1,23 @@
+{
+  "name": "microsoft-graph-user-ingestion",
+  "version": "1.0.0",
+  "description": "Ingests users from Microsoft Graph API into Jira Cloud Assets",
+  "main": "main/ingest_ms_graph_users.js",
+  "scripts": {
+    "start": "node main/ingest_ms_graph_users.js",
+    "dry-run": "node main/ingest_ms_graph_users.js --dry-run",
+    "preview": "node main/ingest_ms_graph_users.js --preview"
+  },
+  "dependencies": {
+    "dotenv": "^17.2.1"
+  },
+  "keywords": [
+    "microsoft-graph",
+    "jira",
+    "assets",
+    "user-ingestion",
+    "azure-ad"
+  ],
+  "author": "",
+  "license": "ISC"
+}
