@@ -50,3 +50,7 @@ node_modules/
 
 # Zip archives
 *.zip
+
+# Standalone utilities not part of main project
+standalone-utilities/microsoft_graph_user_ingestion/
+standalone-utilities/cloud_asset_ingestion/
