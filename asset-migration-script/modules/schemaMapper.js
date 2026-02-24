@@ -86,9 +86,9 @@ class SchemaMapper {
         let bestMatch = null;
         let bestScore = 0;
         
-        for (const [name, schema] of state.cloudSchemas) {
+        for (const [name, schema] of this.cloudSchemas) {
             const cloudName = name.toLowerCase();
-            
+
             // Calculate match score (prefer longer common substrings)
             if (cloudName.includes(normalizedName)) {
                 const score = normalizedName.length / cloudName.length;
@@ -146,7 +146,7 @@ class SchemaMapper {
                 if (match) {
                     // Get schema name for warning
                     let crossSchemaName = 'Unknown';
-                    for (const [name, schema] of state.cloudSchemas) {
+                    for (const [name, schema] of this.cloudSchemas) {
                         if (schema.id === schemaId) {
                             crossSchemaName = name;
                             break;

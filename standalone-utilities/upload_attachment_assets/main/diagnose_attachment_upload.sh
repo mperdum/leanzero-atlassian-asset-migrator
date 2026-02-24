@@ -148,11 +148,11 @@ check_mapping_file() {
     local object_count=$(grep -c "\"cloudId\":" "$mapping_file" || echo "0")
     print_success "Mapping file exists with $object_count object mappings"
 
-    # Check for specific test objects
-    if grep -q "26749" "$mapping_file" && grep -q "26748" "$mapping_file"; then
-        print_success "Test objects (AM-26749, AM-26748) found in mapping"
+    # Check that mapping has valid entries
+    if [ "$object_count" -gt 0 ]; then
+        print_success "Mapping file contains valid object entries"
     else
-        print_warning "Test objects not found in mapping"
+        print_warning "No object mappings found in mapping file"
     fi
 
     return 0

@@ -35,11 +35,10 @@ if (!apiToken) {
   process.exit(1);
 }
 
-// Test object IDs from the error log
-const testObjectIds = [
-  "26749", // Abstract Enterprise
-  "26748", // 010 Editor
-];
+// Test object IDs - replace with actual object IDs from your migration
+const testObjectIds = process.env.TEST_OBJECT_IDS
+  ? process.env.TEST_OBJECT_IDS.split(",")
+  : ["12345", "12346"];
 
 /**
  * Make a test API call to get upload credentials

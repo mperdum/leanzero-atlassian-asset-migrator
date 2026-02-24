@@ -48,7 +48,6 @@
 
 const fs = require("fs");
 const path = require("path");
-const pLimit = require("p-limit");
 require("dotenv").config({
   path: path.resolve(__dirname, "../../../asset-migration-script/.env"),
 });
@@ -779,8 +778,8 @@ class StandaloneTicketConnector {
     const csvPath = path.join(logDir, "permanent_failures.csv");
 
     try {
-      // Read ONLY the current detailed log file (this.detailedLogFile)
-      if (!this.detailedLogFile || !fs.existsSync(this.detailedLogFile)) {
+      // Read ONLY the current detailed log file (this.detailedLogFilePath)
+      if (!this.detailedLogFilePath || !fs.existsSync(this.detailedLogFilePath)) {
         this.logDetailed("   ⚠️  Current detailed log file not found");
         return;
       }
@@ -788,7 +787,7 @@ class StandaloneTicketConnector {
       this.logDetailed(`   📂 Analyzing current log file...`);
 
       // Read current log file only
-      const content = fs.readFileSync(this.detailedLogFile, "utf8");
+      const content = fs.readFileSync(this.detailedLogFilePath, "utf8");
       const lines = content.split("\n");
 
       // Track failures from current run

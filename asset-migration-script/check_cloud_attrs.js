@@ -5,17 +5,19 @@ try {
     fs.readFileSync("./logs/cloud_configuration.json", "utf8"),
   );
 
-  // Find dico_auto_inventory_tracking schema
-  const dicoSchema = cloudConfig.schemas.find(
-    (s) => s[1] && s[1].name === "dico auto inventory tracking",
+  // Find target schema - change this to match your schema name
+  const TARGET_SCHEMA = process.argv[2] || "Your Schema Name";
+  const targetSchema = cloudConfig.schemas.find(
+    (s) => s[1] && s[1].name.toLowerCase() === TARGET_SCHEMA.toLowerCase(),
   );
 
-  if (!dicoSchema) {
-    console.log('Schema "dico auto inventory tracking" not found');
+  if (!targetSchema) {
+    console.log(`Schema "${TARGET_SCHEMA}" not found`);
+    console.log('Available schemas:', cloudConfig.schemas.map(s => s[1]?.name).filter(Boolean).join(', '));
     process.exit(1);
   }
 
-  const schemaData = dicoSchema[1];
+  const schemaData = targetSchema[1];
   console.log(
     `\n=== Schema: ${schemaData.name} (${schemaData.objectSchemaKey}) ===\n`,
   );
@@ -27,8 +29,10 @@ try {
     process.exit(1);
   }
 
-  // Find DAP___Assets and DAW___Assets/ECU object types
-  const targetObjectTypes = ["DAP___Assets", "DAW___Assets/ECU"];
+  // Specify which object types to inspect - change these to match your schema
+  const targetObjectTypes = process.argv.slice(3).length > 0
+    ? process.argv.slice(3)
+    : schemaData.objectTypes.map(ot => ot.name);
 
   for (const objTypeName of targetObjectTypes) {
     const objType = schemaData.objectTypes.find(
@@ -57,9 +61,12 @@ try {
   // Now search for the specific failing field names
   console.log(`\n=== SEARCHING FOR FAILING FIELDS ===\n`);
 
+  // Specify fields to search for - customize these with your failing field IDs/names
+  // Usage: node check_cloud_attrs.js "Schema Name" "ObjectType1" "ObjectType2"
   const failingFields = [
-    { id: 8863, name: "Name of the Item" },
-    { id: 8872, name: "Verification Open Points" },
+    // Add your failing fields here, e.g.:
+    // { id: 8863, name: "Name of the Item" },
+    // { id: 8872, name: "Verification Open Points" },
   ];
 
   for (const field of failingFields) {
@@ -69,7 +76,7 @@ try {
 
     let foundInCloud = false;
 
-    // Check all object types in dico_auto_inventory_tracking
+    // Check all object types in the target schema
     for (const objType of schemaData.objectTypes) {
       // Search by ID
       const matchById = objType.attributes.find(

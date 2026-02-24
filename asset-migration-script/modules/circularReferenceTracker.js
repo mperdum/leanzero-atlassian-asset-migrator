@@ -336,7 +336,7 @@ class CircularReferenceTracker {
             // Step 2: Load datacenter schema attributes to get the DC attribute name
             const fs = require('fs');
             const path = require('path');
-            const datacenterPath = path.join(__dirname, '..', '..', 'datacenter_assets');
+            const datacenterPath = process.env.DATACENTER_PATH || path.join(__dirname, '..', '..', 'datacenter_assets');
             const schemaAttrPath = path.join(datacenterPath, schemaName, 'schema_attributes.json');
             
             if (!fs.existsSync(schemaAttrPath)) {

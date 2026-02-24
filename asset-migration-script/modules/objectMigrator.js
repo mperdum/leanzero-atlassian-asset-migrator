@@ -997,39 +997,7 @@ class ObjectMigrator {
    * Load datacenter object data for a plan object
    */
   async loadDatacenterObject(planObject) {
-    try {
-      // Construct the path to the datacenter object file
-      const schemaPath = path.join(this.datacenterPath, planObject.schema);
-      const objectTypePath = path.join(schemaPath, planObject.objectType);
-      const objectsFile = path.join(objectTypePath, "objects.json");
-
-      if (!fs.existsSync(objectsFile)) {
-        console.log(`        ❌ Objects file not found: ${objectsFile}`);
-        return null;
-      }
-
-      // Load and find the specific object
-      const objects = JSON.parse(fs.readFileSync(objectsFile, "utf8"));
-      const dcObject = objects.find(
-        (obj) =>
-          obj.objectKey === planObject.datacenterKey ||
-          obj.Key === planObject.datacenterKey,
-      );
-
-      if (!dcObject) {
-        console.log(
-          `        ❌ Object not found in datacenter: ${planObject.datacenterKey}`,
-        );
-        return null;
-      }
-
-      return dcObject;
-    } catch (error) {
-      console.log(
-        `        ❌ Error loading datacenter object: ${error.message}`,
-      );
-      return null;
-    }
+    return this.loadDCObject(planObject);
   }
 }
 

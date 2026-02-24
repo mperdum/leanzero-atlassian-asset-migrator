@@ -1,18 +1,32 @@
 # Upload Attachment Assets
 
-This folder contains scripts for uploading attachments to existing Assets objects in Jira Service Management Cloud.
+Uploads file attachments to existing Assets objects in Jira Service Management Cloud.
+
+The core migration script has a built-in attachment upload phase (`UPLOAD_ATTACHMENTS=true`), but this standalone utility exists for cases where attachments need to be uploaded independently -- for example, when the migration ran without attachments enabled, when re-uploading after a schema reset, or when attaching files from a different source than the original datacenter export.
+
+## Prerequisites
+
+- Node.js 18+
+- The `asset-migration-script/` dependencies installed (`cd asset-migration-script && npm install`)
 
 ## Configuration
 
-All scripts use the root `.env` file located at: `standalone-utilities/.env`
+This utility loads its environment from `standalone-utilities/.env`.
 
-The `.env` file must contain:
-- `JIRA_BASE_URL` - Your Jira Cloud instance URL
-- `JIRA_EMAIL` - Email for Jira authentication
-- `JIRA_API_TOKEN` - API token for authentication
-- `WORKSPACE_ID` - Assets workspace ID
-- `OBJECT_TYPE_ID` - Object type ID for the assets
-- Attachment field configuration
+If you haven't created it yet:
+
+```bash
+cp standalone-utilities/.env.example standalone-utilities/.env
+# Edit with your CLOUD_BASE_URL, CLOUD_API_TOKEN, WORKSPACE_ID
+```
+
+Required variables (in `standalone-utilities/.env`):
+
+| Variable | Description |
+|----------|-------------|
+| `CLOUD_BASE_URL` | Your Jira Cloud instance URL |
+| `CLOUD_API_TOKEN` | Base64 encoded `email:api_token` |
+| `WORKSPACE_ID` | Assets workspace ID |
 
 ## Logs
 
@@ -56,3 +70,10 @@ node upload_attachments_to_existing_objects.js
 - Attachment files must be accessible from the machine running the script
 - The script handles large files and implements retry logic for network failures
 - Progress is tracked to allow resuming interrupted upload sessions
+
+## Limitations
+
+- Attachment files must be on the local filesystem (no remote URL support).
+- No file type or size validation -- any file the Jira API accepts will be uploaded. Jira Cloud has a per-file size limit (typically 10 MB for free plans, higher for paid).
+- Uses a single API token. No multi-token rotation for rate limit mitigation.
+- No built-in deduplication -- re-running may create duplicate attachments if the progress state was lost.

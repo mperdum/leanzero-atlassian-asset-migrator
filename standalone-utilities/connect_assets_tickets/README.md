@@ -1,18 +1,39 @@
 # Connect Assets Tickets
 
-This folder contains scripts for connecting Jira tickets to Assets objects in Jira Service Management Cloud.
+Connects Jira tickets to existing Assets objects in Jira Service Management Cloud using custom field mappings.
+
+The core migration script has a built-in ticket connection phase (`CONNECT_TICKETS_TO_OBJECTS=true`), but this standalone utility exists for cases where you need to run ticket connections independently -- for example, after a migration has already completed, when re-linking tickets after schema changes, or when connecting tickets that were migrated separately from the assets.
+
+## Prerequisites
+
+- Node.js 18+
+- The `asset-migration-script/` dependencies installed (`cd asset-migration-script && npm install`)
 
 ## Configuration
 
-All scripts use the root `.env` file located at: `standalone-utilities/.env`
+This utility loads its environment from `asset-migration-script/.env`. If you've already configured the core migration script, no additional setup is needed.
 
-The `.env` file must contain:
-- `JIRA_BASE_URL` - Your Jira Cloud instance URL
-- `JIRA_EMAIL` - Email for Jira authentication
-- `JIRA_API_TOKEN` - API token for authentication
-- `WORKSPACE_ID` - Assets workspace ID
-- `OBJECT_TYPE_ID` - Object type ID for the assets
-- Custom field configuration for ticket connections
+If you haven't yet:
+
+```bash
+cp asset-migration-script/.env.example asset-migration-script/.env
+# Edit with your CLOUD_BASE_URL, CLOUD_API_TOKEN, WORKSPACE_ID
+```
+
+Required variables (in `asset-migration-script/.env`):
+
+| Variable | Description |
+|----------|-------------|
+| `CLOUD_BASE_URL` | Your Jira Cloud instance URL |
+| `CLOUD_API_TOKEN` | Base64 encoded `email:api_token` |
+| `WORKSPACE_ID` | Assets workspace ID |
+
+Optional (for parallel processing with multiple workers):
+
+| Variable | Description |
+|----------|-------------|
+| `CLOUD_API_TOKEN_2` | Additional API token for a second parallel worker |
+| `CLOUD_API_TOKEN_3` | Additional API token for a third parallel worker |
 
 ## Logs
 
@@ -72,3 +93,9 @@ node overall_progress.js
 6. Use `reset_failed_ticket_connections.js` to reset failed items
 7. Re-run the main script to retry failed connections
 8. Check progress with `overall_progress.js`
+
+## Limitations
+
+- Requires a pre-built ticket-to-object mapping file (produced by the datacenter extraction scripts or the core migration).
+- Custom field IDs for the ticket-asset link must be configured manually in `.env` -- these differ per Jira instance.
+- Uses a single API token by default. For large-scale runs (100k+ tickets), throughput is limited by Jira API rate limits. The core migration script's multi-token support is not available here.

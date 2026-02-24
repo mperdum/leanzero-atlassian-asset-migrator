@@ -5,44 +5,32 @@
  * These objects were marked as "created" in the plan but never added to the mapping
  */
 
-const fs = require('fs');
-const path = require('path');
+const fs = require("fs");
+const path = require("path");
 
-const mappingFile = path.join(__dirname, 'logs', 'created_objects_mapping.json');
-const mapping = JSON.parse(fs.readFileSync(mappingFile, 'utf8'));
+const mappingFile = path.join(
+  __dirname,
+  "logs",
+  "created_objects_mapping.json",
+);
+const mapping = JSON.parse(fs.readFileSync(mappingFile, "utf8"));
 
-// 3 missing objects from the plan
+// Missing objects from the plan - customize these with your actual values
+// Find objects that are marked as "created" in the plan but missing from the mapping
 const missingObjects = [
-  {
-    datacenterKey: "UD-11766",
-    cloudKey: "UD-9468",
-    cloudId: "9468",
-    name: "Oliver Matuschin",
-    schema: "User_Directory",
-    objectType: "User",
-    createdAt: "2025-10-24T14:49:27.546Z"
-  },
-  {
-    datacenterKey: "UD-55558",
-    cloudKey: "UD-9806",
-    cloudId: "9806",
-    name: "Shruti Rana",
-    schema: "User_Directory",
-    objectType: "User",
-    createdAt: "2025-10-24T14:49:27.551Z"
-  },
-  {
-    datacenterKey: "AM-43106",
-    cloudKey: "AM-11641",
-    cloudId: "11641",
-    name: "dds-x1e-101",
-    schema: "Asset_Management",
-    objectType: "Asset/Laptop",
-    createdAt: "2025-10-24T14:49:27.555Z"
-  }
+  // Example entries - replace with your actual missing objects:
+  // {
+  //   datacenterKey: "UD-xxxxx",
+  //   cloudKey: "UD-xxxxxx",
+  //   cloudId: "xxxxxx",
+  //   name: "User Name",
+  //   schema: "User_Directory",
+  //   objectType: "User",
+  //   createdAt: "2025-10-24T14:49:27.546Z"
+  // },
 ];
 
-console.log('🔧 Fixing created_objects_mapping.json...');
+console.log("🔧 Fixing created_objects_mapping.json...");
 console.log(`   Current mappings: ${mapping.totalMappings}`);
 
 let added = 0;
@@ -71,8 +59,8 @@ for (const obj of missingObjects) {
       isParent: false,
       isChild: false,
       parentKey: null,
-      childrenKeys: []
-    }
+      childrenKeys: [],
+    },
   ]);
 
   // Add secondary mapping by name
@@ -91,8 +79,8 @@ for (const obj of missingObjects) {
       isParent: false,
       isChild: false,
       parentKey: null,
-      childrenKeys: []
-    }
+      childrenKeys: [],
+    },
   ]);
 
   added++;
@@ -104,13 +92,15 @@ mapping.totalMappings = mapping.mappings.length;
 mapping.lastUpdated = new Date().toISOString();
 
 // Save with backup
-const backupFile = mappingFile + '.backup';
+const backupFile = mappingFile + ".backup";
 fs.copyFileSync(mappingFile, backupFile);
 console.log(`   💾 Backup saved to: ${path.basename(backupFile)}`);
 
-fs.writeFileSync(mappingFile, JSON.stringify(mapping, null, 2), 'utf8');
+fs.writeFileSync(mappingFile, JSON.stringify(mapping, null, 2), "utf8");
 
 console.log(`   ✅ Fixed mapping file!`);
 console.log(`   New total mappings: ${mapping.totalMappings}`);
 console.log(`   Added ${added} missing object(s)`);
-console.log('\n🎉 Done! You can now re-run the migration to process the 25 pending objects.');
+console.log(
+  "\n🎉 Done! You can now re-run the migration to process the 25 pending objects.",
+);

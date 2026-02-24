@@ -19,9 +19,8 @@ const dotenv = require('dotenv');
 
 // Load environment variables
 const envPaths = [
-    path.join(__dirname, '.env'),
-    path.join(__dirname, '..', 'asset-migration-script', '.env'),
-    path.join(__dirname, '..', '.env')
+    path.join(__dirname, '..', '.env'),
+    path.join(__dirname, '.env')
 ];
 
 for (const envPath of envPaths) {
@@ -33,7 +32,7 @@ for (const envPath of envPaths) {
 
 const WORKSPACE_ID = process.env.WORKSPACE_ID;
 const AUTH_TOKEN = process.env.CLOUD_API_TOKEN;
-const DATACENTER_ASSETS_PATH = path.join(__dirname, '..', 'datacenter_assets');
+const DATACENTER_ASSETS_PATH = process.env.DATACENTER_PATH || path.join(__dirname, '..', '..', 'datacenter_assets');
 
 class DatacenterVsCloudAnalyzer {
     constructor() {

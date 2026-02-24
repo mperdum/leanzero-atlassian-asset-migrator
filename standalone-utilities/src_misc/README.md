@@ -5,7 +5,13 @@ Standalone Jira Cloud administration scripts for one-off tasks.
 ## Prerequisites
 
 - Node.js 18+
-- Configured `standalone-utilities/.env` (see `standalone-utilities/.env.example`)
+- The `asset-migration-script/` dependencies installed (`cd asset-migration-script && npm install`)
+- Configured `standalone-utilities/.env` (see `standalone-utilities/.env.example`):
+
+```bash
+cp standalone-utilities/.env.example standalone-utilities/.env
+# Edit with your CLOUD_BASE_URL, CLOUD_API_TOKEN, WORKSPACE_ID
+```
 
 ## Scripts
 
@@ -31,3 +37,16 @@ node cleanup_objects.js --confirm --schema "MySchema" # Clean specific schema
 ```
 
 **Required env vars:** `CLOUD_BASE_URL`, `CLOUD_API_TOKEN`, `WORKSPACE_ID`
+
+**Options:**
+
+| Flag | Description |
+|------|-------------|
+| `--dry-run` | Show what would be deleted without making changes |
+| `--confirm` | Required to actually delete objects |
+| `--schema "Name"` | Limit cleanup to a specific schema |
+| `--batch-size N` | Number of objects to delete per batch (default: 50) |
+
+## Why Standalone
+
+These are admin utilities that operate on a Jira Cloud instance directly, independent of any migration state. They don't read migration plans or mapping files. They were kept separate from the core migration script because they serve a different purpose: instance administration rather than data migration.

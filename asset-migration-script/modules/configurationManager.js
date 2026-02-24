@@ -255,7 +255,7 @@ EXAMPLES:
   node main.js --connect-tickets --schema "Asset_Management" --limit 10
   
   # Clean objects before migration
-  node main.js --cleanup-objects --field-discovery --schema "Asset_Management"
+  node main.js --cleanup-objects --schema "Asset_Management"
   
   # Analyze datacenter vs cloud differences
   node main.js --analyze-dc

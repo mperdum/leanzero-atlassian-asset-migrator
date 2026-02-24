@@ -2,6 +2,8 @@
 
 A comprehensive Node.js tool for migrating and managing Jira Cloud automation rules between instances.
 
+This utility is separate from the core asset migration script because Jira automation rules are an entirely different domain -- they use the Jira Automation REST API (not the Assets API), have their own project/issue-type ID mapping requirements, and follow a completely different migration workflow. It also supports Cloud-to-Cloud and Sandbox-to-Production scenarios that have nothing to do with DC-to-Cloud asset migration.
+
 ## Features
 
 - **7 Migration Modes** for different scenarios

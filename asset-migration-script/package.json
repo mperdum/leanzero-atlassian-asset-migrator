@@ -7,8 +7,7 @@
     "start": "node main.js",
     "dry-run": "node main.js --dry-run",
     "test": "node main.js --dry-run --limit 5",
-    "report": "node main.js --report",
-    "resume": "node main.js --resume"
+    "report": "node main.js --report"
   },
   "keywords": [
     "migration",
@@ -19,7 +18,6 @@
   "license": "MIT",
   "dependencies": {
     "dotenv": "^17.2.1",
-    "form-data": "^4.0.0",
-    "p-limit": "^3.1.0"
+    "form-data": "^4.0.0"
   }
 }

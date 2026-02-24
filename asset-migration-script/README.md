@@ -254,7 +254,7 @@ TICKET_UPDATE_WORKERS=5
      "customFieldsContainingObject": [{
        "fieldId": "customfield_25532",
        "fieldName": "Asset Reference Field",  // Auto-fetched from datacenter
-       "fieldValue": ["Your Company IT - packaged software (SAM-58832)"]
+       "fieldValue": ["Example Application - packaged software (SAM-00001)"]
      }]
    }
    ```
@@ -401,7 +401,7 @@ NEW:    Extract → Plan Creation → Field Status → Dependency Check → Crea
 ```
 
 ### Phase 1: **Plan Creation & Analysis**
-- Load ALL datacenter objects from all schemas (23,875+ objects)
+- Load ALL datacenter objects from all schemas
 - Build complete dependency graph with cross-schema analysis  
 - Perform topological sorting (standalone → deepest dependencies → parents)
 - Extract comprehensive field metadata for every object
@@ -492,7 +492,7 @@ node main.js --dry-run --schema Application_Approval_Process --limit 5
 # Full schema migration  
 node main.js --schema Application_Approval_Process
 
-# All schemas (23,875 assets)
+# All schemas
 node main.js
 ```
 
@@ -577,17 +577,7 @@ rm logs/migration_plan.json && node main.js
 - **Benefit**: Tickets connect automatically during migration (not post-migration)
 - **Control**: Fully respects `CONNECT_TICKETS_TO_OBJECTS` environment variable
 
-## ✅ **MIGRATION STATUS: COMPLETE SUCCESS (December 2024)**
-
-### **Full Migration Achievement**
-- **Status**: ✅ **100% COMPLETE SUCCESS**
-- **Total Objects**: 23,875 assets migrated successfully
-- **Success Rate**: 100% - All objects created, no failures
-- **References**: All reference relationships resolved successfully  
-- **Attachments**: Successfully uploaded where available
-- **Tickets**: Connected to assets where configured
-
-**System Status**: PRODUCTION DEPLOYMENT SUCCESSFUL - All 23,875 datacenter assets successfully migrated to Jira Cloud Assets with complete reference relationships and metadata preservation.
+## Troubleshooting
 
 ### Reference Resolution Issues
 - Enable cross-schema references in Jira Cloud Assets admin if needed
@@ -595,12 +585,12 @@ rm logs/migration_plan.json && node main.js
 - Check reference field configurations and cardinality limits
 - Review AQL restrictions on reference fields
 - **Schema Isolation**: Script validates objects are in correct schema to prevent cross-reference issues
-- See `memory-bank/systemPatterns.md` for schema isolation implementation details
+- See the schema mapper module for schema isolation implementation details
 
 ### Performance Issues
 - Large datasets: Use `--limit` for testing, then run full migration
 - API rate limiting: Automatic handling with exponential backoff
-- Memory usage: Monitor for large object counts (23,875+ objects)
+- Memory usage: Monitor for large object counts (10,000+ objects)
 - Network timeouts: 30-second timeouts with automatic retries
 
 ### Migration Failures
@@ -713,7 +703,7 @@ You are an expert Jira Assets migration assistant. When I encounter "FATAL: No c
    - If Reference: specify what it references (User/Company/etc.)
    - If multi-value: mention cardinality
 
-3. **Field Type Mapping**: If it's a Reference field, tell me the attribute ID needs to be added to fieldTypeMapping.json knownReferenceFields array.
+3. **Field Type Mapping**: If it's a Reference field, ensure the attribute is properly configured in the cloud schema.
 
 **TOOLS TO USE:**
 - Use terminal commands to search datacenter_assets/ for attribute IDs
@@ -816,24 +806,6 @@ This approach will help me quickly resolve field mapping issues without lengthy 
 
 Instead of running field discovery scripts, manually add field IDs to `fieldTypeMapping.json`:
 
-```json
-{
-  "knownReferenceFields": [
-    // Add Reference field IDs (User, Company, Location references)
-    "2143", "2144", "2145", "6211", "6212", "8509", "8625", "8666"
-  ],
-  "knownSelectFields": [
-    // Add Select/Dropdown field IDs
-  ],
-  "knownBooleanFields": [
-    // Add Yes/No field IDs
-  ],
-  "knownTextFields": [
-    // Add Text input field IDs
-  ]
-}
-```
-
 #### 5. Systematic Troubleshooting Workflow
 
 1. **Run Migration**: `node main.js --schema [Schema] --type [Type] --limit 1`
@@ -847,21 +819,72 @@ Instead of running field discovery scripts, manually add field IDs to `fieldType
 
 **Asset Owner Fields**:
 - Type: Reference → User (User Directory)
-- Schemas: PRD_Assets, Information_Asset_Management, Software_Asset_Management
-- Attribute IDs: 6211, 8509, 8666
+- Check your schema for the specific attribute IDs
 
 **Company Fields**:
-- Type: Reference → Company (User Directory)  
-- Schemas: Master_Data, User_Directory, LBS_Asset_Management
-- Attribute IDs: 2017, 2143, 2144
+- Type: Reference → Company (User Directory)
+- Check your schema for the specific attribute IDs
 
 **Manager/Administrator Fields**:
 - Type: Reference → User (User Directory)
 - Allow Multiple: Usually Yes for Administrators
-- Attribute IDs: 2145, 6212
 
 This systematic approach ensures rapid resolution of migration issues with minimal AI interaction overhead.
 
-## Support
+## Utility Scripts
 
-Check `memory-bank/` folder for project context and current issues.
+The following scripts in this directory are standalone diagnostic and recovery tools. They operate on the migration plan and mapping files produced by the main migration and are not part of the main execution flow.
+
+### analyze_failures.js
+
+Groups failed objects from `logs/migration_plan.json` by error message to identify patterns.
+
+```bash
+node analyze_failures.js
+```
+
+Reads the migration plan, filters for `status === 'failed'`, and prints a summary showing each unique error, how many objects share that error, and up to 5 example object keys.
+
+### simple_analyze_failures.js
+
+A lighter variant of `analyze_failures.js` that extracts field-level error patterns (field ID, field name, attribute type) from error messages.
+
+```bash
+node simple_analyze_failures.js
+```
+
+Useful when failures are concentrated in specific attribute types and you need to identify which fields to fix in the Cloud schema.
+
+### check_cloud_attrs.js
+
+Inspects `logs/cloud_configuration.json` to verify whether specific datacenter attributes exist in the Cloud schema. Helps debug "attribute not found" migration failures.
+
+```bash
+# List all attributes for all object types in a schema
+node check_cloud_attrs.js "Your Schema Name"
+
+# Inspect specific object types
+node check_cloud_attrs.js "Your Schema Name" "ObjectType1" "ObjectType2"
+```
+
+Customize the `failingFields` array in the script to search for specific field IDs/names that are causing migration errors.
+
+### fix_mapping.js
+
+Patches `logs/created_objects_mapping.json` by manually adding objects that were created in Cloud but missing from the mapping file. This can happen when the migration process is interrupted after creating an object but before recording it.
+
+```bash
+node fix_mapping.js
+```
+
+Edit the `missingObjects` array in the script with your actual datacenter keys, cloud keys, and cloud IDs before running. Creates a `.backup` of the mapping file before writing.
+
+### reset_failed_to_pending.js
+
+Resets all failed objects in `logs/migration_plan.json` back to `pending` status so they can be retried on the next migration run.
+
+```bash
+node reset_failed_to_pending.js
+```
+
+Clears the `error`, `cloudId`, `createdAt`, and `updatedAt` fields for each failed object and updates the plan statistics. Use this after fixing the root cause of failures (e.g., adding missing Cloud attributes) to retry without re-running the full migration.

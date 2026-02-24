@@ -290,7 +290,7 @@ async function fixJsonMode(
     const rules = JSON.parse(fileContent);
 
     // Handle both formats: {cloud: true, rules: [...]} or just [...]
-    const rulesArray = rules.rules || rules;
+    let rulesArray = rules.rules || rules;
     const isCloudSource = rules.cloud === true;
 
     if (!Array.isArray(rulesArray)) {

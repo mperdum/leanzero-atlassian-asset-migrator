@@ -38,11 +38,6 @@ echo "=========================================="
 mkdir -p "$OUTPUT_DIR"
 
 # Note: Logging already initialized by setup_logging() above
-# Additional configuration output
-echo "  PARALLEL_WORKERS: $PARALLEL_WORKERS"
-echo "  FETCH_REFERENCES: $FETCH_REFERENCES"
-echo "  TICKETS_FILTER_ID: $TICKETS_FILTER_ID"
-echo "=========================================="
 
 # Global statistics counters
 TOTAL_SCHEMAS_PROCESSED=0

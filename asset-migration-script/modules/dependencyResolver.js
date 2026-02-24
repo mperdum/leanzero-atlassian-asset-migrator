@@ -25,7 +25,7 @@ class DependencyResolver {
      * - Indexes all datacenter objects for fast dependency lookup during plan creation
      * - Creates comprehensive object registry by multiple keys (objectKey, name, label)
      * - Used during plan building phase to resolve dependencies across schemas
-     * - Performance optimization - builds searchable index for 23,875+ objects
+     * - Performance optimization - builds searchable index for large object sets
      * - Only used during plan creation, not during plan execution
      */
     async initialize() {

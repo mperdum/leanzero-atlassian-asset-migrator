@@ -37,7 +37,15 @@ program
     "Jira instance site URL (e.g., yourcompany.atlassian.net)",
   )
   .requiredOption("--cloud-id <id>", "Jira Cloud ID")
-  .action(blanketMode.execute);
+  .action((options) => {
+    blanketMode(
+      rl,
+      options.username,
+      options.token,
+      options.siteUrl,
+      options.cloudId,
+    );
+  });
 
 // Consolidation dual source command
 program
@@ -57,7 +65,23 @@ program
   .requiredOption("--target-token <token>", "Target API token")
   .requiredOption("--target-site-url <url>", "Target site URL")
   .requiredOption("--target-cloud-id <id>", "Target Cloud ID")
-  .action(consolidationModes.executeDualSource);
+  .action((options) => {
+    consolidationModes.consolidationDualSourceMode(
+      rl,
+      options.source1Username,
+      options.source1Token,
+      options.source1SiteUrl,
+      options.source1CloudId,
+      options.source2Username,
+      options.source2Token,
+      options.source2SiteUrl,
+      options.source2CloudId,
+      options.targetUsername,
+      options.targetToken,
+      options.targetSiteUrl,
+      options.targetCloudId,
+    );
+  });
 
 // Consolidation sandbox command
 program
@@ -73,7 +97,19 @@ program
   .requiredOption("--target-token <token>", "Target API token")
   .requiredOption("--target-site-url <url>", "Target site URL")
   .requiredOption("--target-cloud-id <id>", "Target Cloud ID")
-  .action(consolidationModes.executeSandbox);
+  .action((options) => {
+    consolidationModes.consolidationSandboxMode(
+      rl,
+      options.sourceUsername,
+      options.sourceToken,
+      options.sourceSiteUrl,
+      options.sourceCloudId,
+      options.targetUsername,
+      options.targetToken,
+      options.targetSiteUrl,
+      options.targetCloudId,
+    );
+  });
 
 // Consolidation prod command
 program
@@ -87,7 +123,19 @@ program
   .requiredOption("--target-token <token>", "Target API token")
   .requiredOption("--target-site-url <url>", "Target site URL")
   .requiredOption("--target-cloud-id <id>", "Target Cloud ID")
-  .action(consolidationModes.executeProd);
+  .action((options) => {
+    consolidationModes.consolidationProdMode(
+      rl,
+      options.sourceUsername,
+      options.sourceToken,
+      options.sourceSiteUrl,
+      options.sourceCloudId,
+      options.targetUsername,
+      options.targetToken,
+      options.targetSiteUrl,
+      options.targetCloudId,
+    );
+  });
 
 // Generate JSON command
 program
@@ -97,7 +145,15 @@ program
   .requiredOption("--token <token>", "Jira instance API token")
   .requiredOption("--site-url <url>", "Jira instance site URL")
   .requiredOption("--cloud-id <id>", "Jira Cloud ID")
-  .action(jsonModes.generateJsonMode);
+  .action((options) => {
+    jsonModes.generateJsonMode(
+      rl,
+      options.username,
+      options.token,
+      options.siteUrl,
+      options.cloudId,
+    );
+  });
 
 // Fix JSON command
 program
@@ -177,7 +233,19 @@ program
   .requiredOption("--target-token <token>", "Target API token")
   .requiredOption("--target-site-url <url>", "Target site URL")
   .requiredOption("--target-cloud-id <id>", "Target Cloud ID")
-  .action(jsonModes.importJsonMode);
+  .action((options) => {
+    jsonModes.importJsonMode(
+      rl,
+      options.sourceUsername,
+      options.sourceToken,
+      options.sourceSiteUrl,
+      options.sourceCloudId,
+      options.targetUsername,
+      options.targetToken,
+      options.targetSiteUrl,
+      options.targetCloudId,
+    );
+  });
 
 // Sync States command
 program

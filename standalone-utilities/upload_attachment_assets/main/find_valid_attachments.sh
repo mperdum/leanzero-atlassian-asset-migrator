@@ -19,21 +19,13 @@ echo "Scanning objects for valid attachments..."
 echo "This will test multiple object IDs to find ones with current attachments"
 echo ""
 
-# Array of object IDs to test - from your extracted data
+# Array of object IDs to test - replace with your actual object IDs
 OBJECT_IDS=(
-    "55431"  # AM-55431
-    "17863"  # AM-17863 
-    "60920"  # AM-60920
-    "54537"  # AM-54537
-    "17899"  # Your original test
-    "55432"  # Try next ID
-    "55433"
-    "55434"
-    "55435"
-    "17864"
-    "17865"
-    "60921"
-    "60922"
+    "12345"
+    "12346"
+    "12347"
+    "12348"
+    "12349"
 )
 
 # You can also specify a range to scan
@@ -109,7 +101,7 @@ done
 if [ $FOUND_COUNT -gt 0 ]; then
     echo ""
     echo "You can test with any of these object IDs:"
-    echo "  ./test_single_attachment.sh ${VALID_OBJECTS[0]}"
+    echo "  node test_attachment_endpoint.js  (set TEST_OBJECT_IDS=${VALID_OBJECTS[0]} in .env)"
 else
     echo ""
     echo "No objects with valid attachments found in the tested range."

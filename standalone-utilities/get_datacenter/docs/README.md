@@ -3,11 +3,14 @@
 ## 📁 Project Structure
 
 ```
-get_datacenter_assets/
+get_datacenter/
 ├── main/                                   # Active scripts (run these)
 │   ├── datacenter_common.sh               # Shared utilities
 │   ├── get_datacenter_assets.sh           # Asset extraction script
-│   └── get_datacenter_ticket_associations.sh  # Ticket extraction script
+│   ├── get_datacenter_attachments.sh      # Attachment download script
+│   ├── get_datacenter_comment_visibility.sh # Comment visibility extraction
+│   ├── get_datacenter_ticket_associations.sh  # Ticket extraction script
+│   └── generate_automation_mapping.sh     # Automation rule mapping
 ├── bkp/                                    # Backup files
 │   ├── get_datacenter_assets.sh.backup
 │   └── get_datacenter_assets.sh.backup_split
@@ -42,7 +45,6 @@ get_datacenter_assets/
 - Fetches all object schemas
 - Fetches all object types and their hierarchies
 - Extracts all objects with attributes
-- Downloads attachments (optional)
 - Fetches reference info (optional)
 
 **Output:** `datacenter_assets/SchemaName/ObjectType/objects.json`
@@ -133,10 +135,11 @@ OUTPUT_DIR="datacenter_assets"
 ### Asset Extraction Settings (`main/get_datacenter_assets.sh`)
 ```bash
 FETCH_REFERENCES=true             # Fetch reference info per object
-FETCH_ATTACHMENTS=true            # Download attachments
-MAX_ATTACHMENT_SIZE_MB=45         # Max attachment size
 PARALLEL_WORKERS=10               # Parallel processing workers
 ```
+
+### Attachment Extraction (`main/get_datacenter_attachments.sh`)
+A separate script handles attachment downloads from datacenter objects.
 
 ---
 
@@ -254,8 +257,8 @@ Ensure all three files are in the `main/` directory:
 
 1. **Run ticket extraction separately** - It's faster and can be done overnight
 2. **Adjust PARALLEL_WORKERS** - Lower if server struggles, higher if fast
-3. **Disable FETCH_ATTACHMENTS** - If you don't need attachment files
-4. **Run both scripts in parallel** - If server can handle the load
+3. **Skip attachment extraction** - Run only the asset script if you don't need attachment files
+4. **Run scripts in parallel** - If server can handle the load
 
 ---
 

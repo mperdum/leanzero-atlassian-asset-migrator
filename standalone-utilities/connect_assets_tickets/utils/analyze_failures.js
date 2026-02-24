@@ -163,10 +163,10 @@ analyzeFailures()
     console.log(
       '1. The majority of "An error occurred" are likely workspace mismatch issues',
     );
-    console.log("2. Rate-limited tickets (675) should be retried");
-    console.log("3. Permission errors (138) need access verification");
+    console.log("2. Rate-limited tickets should be retried");
+    console.log("3. Permission errors need access verification");
     console.log(
-      "4. Validation errors (254) may need object/field investigation",
+      "4. Validation errors may need object/field investigation",
     );
   })
   .catch(console.error);
