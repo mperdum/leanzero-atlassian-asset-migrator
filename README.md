@@ -6,7 +6,7 @@ The system is designed to handle complex enterprise migrations while preserving 
 
 ## About LeanZero
 
-This project is part of the LeanZero ecosystem, focused on building tools that help developers work more efficiently with Jira migrations, asset management, and enterprise workflows. For more information about our work, additional resources, tutorials, and community discussions, visit [leanzero.atlascrafted.com](https://leanzero.atlascrafted.com). You can also join our Discord community directly from the website for conversations with other developers working on similar projects.
+This project is part of the LeanZero ecosystem, focused on building tools that help developers work more efficiently with Jira migrations, asset management, and enterprise workflows. For more information about our work, additional resources, tutorials, and community discussions, visit [leanzero.net](https://leanzero.net). You can also join our Discord community directly from the website for conversations with other developers working on similar projects.
 
 ## What This Project Can Do For You
 
@@ -326,7 +326,7 @@ There are opportunities to extend the toolkit further. A web-based UI could prov
 
 The Jira Assets DC-to-Cloud Migration Toolkit provides a comprehensive solution for migrating your Assets data from Datacenter to Cloud. With intelligent dependency resolution, resumable operations, and comprehensive logging, it handles the complexity of enterprise migrations while giving you control over the process. Whether you are migrating a single schema or an entire workspace, this toolkit gives you the tools to do it effectively.
 
-For support, additional resources, and community discussions, visit [leanzero.atlascrafted.com](https://leanzero.atlascrafted.com).
+For support, additional resources, and community discussions, visit [leanzero.net](https://leanzero.net).
 
 ## License
 
