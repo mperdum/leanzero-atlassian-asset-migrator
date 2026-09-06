@@ -2205,7 +2205,7 @@ function fixAutomationRules(
     }
 
     // CRITICAL FIX: Fix project IDs in trigger eventFilters (Cloud uses these for scoping)
-    // Cloud pattern: "eventFilters": ["ari:cloud:jira:62c1a13b-3325-44fb-b995-6c6bb13381c3:project/10346"]
+    // Cloud pattern: "eventFilters": ["ari:cloud:jira:00000001-0000-4000-8000-000000000001:project/10346"]
     if (
       rule.trigger &&
       rule.trigger.value &&
