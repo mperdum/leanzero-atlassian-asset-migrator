@@ -34,9 +34,9 @@ The automation-service utility helps migrate Jira automation rules between insta
 
 The get_datacenter utility provides shell scripts for extracting Assets data from your Datacenter instance via REST API. These scripts export schemas, object types, objects, attributes, and references to JSON files that the migration engine can process.
 
-### CSV-Based Bulk Ingestion
+### Comment Visibility Sync
 
-If you prefer to import assets from CSV files rather than from Datacenter exports, the cloud_asset_ingestion utility can bulk-create objects from spreadsheet data. This is useful for initial data loading or for importing data from external systems.
+The sync_comment_visibility utility carries per-comment visibility settings from Datacenter to Cloud. It runs in two steps: a bash script extracts the visibility data from Datacenter (so it can run behind the firewall), and a Node script updates the Cloud comments using parallel workers.
 
 ### Admin Utilities
 
@@ -94,7 +94,7 @@ This project uses two `.env` files in different locations:
 
 | `.env` File Location | Used By |
 |----------------------|---------|
-| `asset-migration-script/.env` | Core migration, cloud_asset_ingestion, connect_assets_tickets |
+| `asset-migration-script/.env` | Core migration, connect_assets_tickets |
 | `standalone-utilities/.env` | src_misc, upload_attachment_assets |
 
 Most users should start by creating the core `.env`:
@@ -116,6 +116,18 @@ bash main/get_datacenter_assets.sh
 
 This creates a `datacenter_assets/` directory at the project root with the exported data.
 
+`get_datacenter_assets.sh` is the only extract you always need — it pulls the schemas, object types, objects, attributes and references that the migration engine reads. Run the others only for the features you intend to enable:
+
+| Script | Extracts | Needed for |
+|--------|----------|------------|
+| `get_datacenter_assets.sh` | Schemas, object types, objects, attributes, references | **Always** |
+| `get_datacenter_attachments.sh` | Object attachments | `UPLOAD_ATTACHMENTS=true`, or `upload_attachment_assets` |
+| `get_datacenter_ticket_associations.sh` | Ticket-to-object custom field values | `CONNECT_TICKETS_TO_OBJECTS=true`, or `connect_assets_tickets` |
+| `get_datacenter_comment_visibility.sh` | Per-comment visibility settings | `sync_comment_visibility` |
+| `generate_automation_mapping.sh` | Source data for automation rule mapping | `automation-service` |
+
+Keep the export. Extraction is the slow part, and every dry run, retry and troubleshooting session afterwards reads it rather than Datacenter — re-extracting because the directory was deleted costs hours nobody budgets for.
+
 #### Step 2: Configure Cloud Credentials
 
 ```bash
@@ -135,17 +147,25 @@ node main.js              # Production run
 
 ## Configuration Options
 
-See `asset-migration-script/.env.example` for all available options. Here are the key settings:
+Every setting has both a CLI flag and an environment variable, and the flag wins when both are present. See `asset-migration-script/.env.example` for the full list. Here are the key settings:
 
-| Variable | Description |
-|----------|-------------|
-| `CLOUD_BASE_URL` | Your Jira Cloud instance URL (e.g. `your-domain.atlassian.net`) |
-| `CLOUD_API_TOKEN` | Base64 encoded `email:api_token` |
-| `WORKSPACE_ID` | Jira Cloud Assets workspace ID (UUID) |
-| `DRY_RUN` | Test without creating objects (`true`/`false`) |
-| `SCHEMA_FILTER` | Migrate only a specific schema by name |
-| `UPLOAD_ATTACHMENTS` | Enable attachment migration (`true`/`false`) |
-| `CONNECT_TICKETS_TO_OBJECTS` | Enable ticket connections (`true`/`false`) |
+| Variable | CLI flag | Description |
+|----------|----------|-------------|
+| `CLOUD_BASE_URL` | — | Your Jira Cloud domain, without `https://` (e.g. `your-domain.atlassian.net`) |
+| `CLOUD_API_TOKEN` | — | Base64 of `email:api_token`. Not the raw token — this is the most common setup error, and it presents as a `401` that looks like an expired token |
+| `WORKSPACE_ID` | — | Jira Cloud Assets workspace UUID |
+| `DRY_RUN` | `--dry-run` | Validate and report; create nothing |
+| `SCHEMA_FILTER` | `--schema <name>` | Migrate one schema. Use it — a failure inside one schema is diagnosable |
+| `TYPE_FILTER` | `--type <name>` | One object type within the schema |
+| `LIMIT_PER_TYPE` | `--limit <n>` | Cap objects per type. The smoke-test lever |
+| `UPLOAD_ATTACHMENTS` | `--upload-attachments` | Upload attachments during the run |
+| `CONNECT_TICKETS_TO_OBJECTS` | `--connect-tickets` | Link tickets to objects during the run |
+| `AUTO_CREATE_OBJECT_TYPES` | `--auto-create-types` | Create missing object types rather than failing (default on) |
+| `AUTO_CREATE_REFERENCES` | `--auto-create-refs` | Create missing referenced objects (default on) |
+| `DATACENTER_ANALYSIS` | `--analyze-dc` | Report DC-versus-Cloud configuration differences. Run this before migrating |
+| `CLEANUP_OBJECTS` | `--cleanup-objects` | **Deletes all objects from the Cloud workspace before migrating.** Sandbox only |
+
+Leave `SKIP_VALIDATION_ERRORS`, `IGNORE_MISSING_REQUIRED` and `ALLOW_PARTIAL_MIGRATION` at their defaults. Each one turns a loud failure into a quiet, half-migrated object. They exist for specific recovery situations; none of them belongs in a production `.env`.
 
 ### Advanced Options
 
@@ -162,7 +182,7 @@ Each utility in `standalone-utilities/` has its own README with detailed usage i
 | Utility | Purpose |
 |---------|---------|
 | **automation-service** | Migrate Jira automation rules between instances (CLI-based) |
-| **cloud_asset_ingestion** | Bulk-import assets from CSV files |
+| **sync_comment_visibility** | Sync per-comment visibility from Datacenter to Cloud |
 | **connect_assets_tickets** | Connect Jira tickets to existing cloud assets |
 | **get_datacenter** | Extract data from Jira Datacenter via REST API |
 | **upload_attachment_assets** | Upload attachments to existing cloud objects |
@@ -220,7 +240,7 @@ The project is organized with clear separation of concerns:
 │
 └── standalone-utilities/         # Supporting tools
     ├── automation-service/       # Jira automation rule migrator
-    ├── cloud_asset_ingestion/    # CSV-to-Cloud ingestion
+    ├── sync_comment_visibility/  # Per-comment visibility sync
     ├── connect_assets_tickets/   # Ticket-to-asset connections
     ├── get_datacenter/           # Datacenter extraction (shell)
     ├── upload_attachment_assets/ # Attachment upload utility
@@ -266,6 +286,26 @@ Jira Cloud has API rate limits. If you encounter rate limit errors, reduce `MAX_
 ### Test with a Small Dataset First
 
 Before migrating your entire Assets workspace, test with a single schema or a small subset of objects. This helps you validate your configuration and estimate migration time.
+
+### Know The Recovery Scripts Before You Need Them
+
+`asset-migration-script/` ships five helpers that turn a failed run into a diagnosable one. Migration state is checkpointed in `logs/migration_plan.json`, so a crashed run is resumed by re-running — already-created objects are skipped, and no duplicates are produced.
+
+| Script | What it does |
+|--------|--------------|
+| `analyze_failures.js` | Reads the plan and reports every object with status `failed`, grouped so you can see whether it is one cause or fifty |
+| `simple_analyze_failures.js` | The terse version, for a quick count |
+| `reset_failed_to_pending.js` | Flips `failed` rows back to `pending` so the next run retries them. Run it **after** fixing the cause, not instead of |
+| `check_cloud_attrs.js` | Dumps the Cloud attribute configuration for a schema — the fastest way to see why an attribute write was rejected |
+| `fix_mapping.js` | Repairs `created_objects_mapping.json` when an object is marked created in the plan but never made it into the mapping |
+
+Never reset failures to pending before you know why they failed. A retry against an unchanged cause produces the same failures plus wasted API budget, and the second run's log makes the first one harder to read.
+
+### Verify In The Assets UI, Not In The Run Summary
+
+Pick ten objects **before** the run — the deepest hierarchy, one with cross-schema references, one with attachments — and write down what each should contain. Afterwards, open them in the Assets UI and check every attribute, then click a reference and confirm it lands on the right object. Count per object type, DC against Cloud. Open a ticket that referenced an asset and confirm the custom field points at the migrated object. Download an attachment.
+
+"20,000 objects created" is a proxy metric. It is entirely compatible with 20,000 objects whose references are empty, which is the same as no migration at all for anyone who uses the data.
 
 ### Review Logs Carefully
 
